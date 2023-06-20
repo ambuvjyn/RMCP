@@ -16,28 +16,18 @@ In this analysis, we aimed to explore the relationship between various variables
 ## Load Required Packages
 
 ```{r}
-# Install the MASS package (if not already installed)
-if (!requireNamespace("MASS", quietly = TRUE)) {
-  install.packages("MASS")
-}
-
-# Load the MASS package
 library(MASS)
-
 ```
 
 ## Data Analysis and EDA
 
-```{r}
+```{r, fig.width=5, fig.height=3}
 # Load the mtcars dataset
 data(mtcars)
 
-# Explore the structure and summary statistics
-str(mtcars)
-summary(mtcars)
-
 # Bar plot of MPG by transmission type (am)
-barplot(table(mtcars$am), main = "MPG by Transmission Type", xlab = "Transmission Type", ylab = "Frequency", col = "steelblue")
+barplot(table(mtcars$am), main = "MPG by Transmission Type", 
+        xlab = "Transmission Type", ylab = "Frequency", col = "steelblue")
 
 # Scatter plot of MPG against weight
 plot(mtcars$wt, mtcars$mpg, xlab = "Weight", ylab = "MPG")
@@ -48,13 +38,12 @@ boxplot(mpg ~ cyl, data = mtcars, xlab = "Number of Cylinders", ylab = "MPG")
 # Histogram of MPG
 hist(mtcars$mpg, main = "Distribution of MPG", xlab = "MPG")
 
-
 ```
-Next, we built multiple linear regression models to analyze the relationship between MPG and the variables of interest. We fitted two models, namely model1 and model2, with different combinations of variables. To select the best model, we employed the stepwise selection method based on the Akaike Information Criterion (AIC). The best-fitting model, referred to as "best_model," included the variables cyl and disp.
+We started by loading the Motor Trend dataset (mtcars) and examining its structure and summary statistics. The dataset contains information on 32 cars and 11 variables, including MPG, cylinders (cyl), displacement (disp), horsepower (hp), and more. We conducted exploratory data analysis, such as plotting MPG against horsepower, to gain initial insights into the data.
 
 ## Model Building and Selection
 
-```{r}
+```{r, echo=TRUE, results='hide'}
 # Fit multiple models
 model1 <- lm(mpg ~ cyl + disp, data = mtcars)
 model2 <- lm(mpg ~ cyl + disp + hp, data = mtcars)
@@ -66,13 +55,13 @@ best_model <- stepAIC(model2, direction = "backward")
 summary(best_model)
 
 ```
-We started by loading the Motor Trend dataset (mtcars) and examining its structure and summary statistics. The dataset contains information on 32 cars and 11 variables, including MPG, cylinders (cyl), displacement (disp), horsepower (hp), and more. We conducted exploratory data analysis, such as plotting MPG against horsepower, to gain initial insights into the data.
+We built multiple linear regression models to analyze the relationship between MPG and the variables of interest. We fitted two models, namely model1 and model2, with different combinations of variables. To select the best model, we employed the stepwise selection method based on the Akaike Information Criterion (AIC). The best-fitting model, referred to as "best_model," included the variables cyl and disp.
 
 ## Coefficient Interpretation
 
 The selected model is: r best_model\$formula.
 
-```{r}
+```{r, echo=TRUE, results='hide'}
 # Interpret the coefficients
 coef_summary <- summary(best_model)$coefficients
 
@@ -101,8 +90,7 @@ To assess the assumptions of the linear regression model, we performed diagnosti
 cyl_coef <- coef(best_model)["cyl"]
 t_test <- t.test(mtcars$cyl, alternative = "two.sided", mu = 0, conf.level = 0.95)
 
-# Print the hypothesis test results
-t_test
+t_test$p.value
 
 ```
 To quantify the uncertainty in our conclusions, we conducted a hypothesis test on the significance of the cyl coefficient using a one-sample t-test. The test yielded a highly significant p-value (< 2.2e-16), indicating strong evidence to reject the null hypothesis that the true mean is equal to zero. Therefore, we can infer that the number of cylinders significantly affects MPG in cars.
